@@ -13,12 +13,12 @@ export async function connectToDatabase() {
   await client.connect();
 
   const db: mongoDB.Db = client.db(process.env.DB_NAME);
-  const gamesCollection: mongoDB.Collection = db.collection(
+  const estoqueCollection: mongoDB.Collection = db.collection(
     process.env.COLLECTION_NAME
   );
-  collections.estoque = gamesCollection;
+  collections.estoque = estoqueCollection;
   console.log(
-    `Successfully connected to database: ${db.databaseName} and collection: ${gamesCollection.collectionName}`
+    `Successfully connected to database: ${db.databaseName} and collection: ${estoqueCollection.collectionName}`
   );
 
   return client
