@@ -3,14 +3,24 @@ import React from "react";
 import { Route, Routes } from "react-router-dom";
 
 import { Header } from "./components/Header";
-import { Listas } from "./components/Listas";
+import { SimpleDatas } from "./components/SimpleDatas";
+import { Products } from "./components/Products";
+
+function ControleEstoque() {
+  return (
+    <>
+      <SimpleDatas />
+      <Products />
+    </>
+  );
+}
 
 function App() {
   return (
     <>
       <Header />
       <Routes>
-        <Route path="/" element={<Listas />} />
+        <Route path="/" element={<ControleEstoque />} />
       </Routes>
     </>
   );
