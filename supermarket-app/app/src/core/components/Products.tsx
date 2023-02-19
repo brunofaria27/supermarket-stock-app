@@ -225,9 +225,21 @@ export const Products = () => {
                 justifyContent: "right",
               }}
             >
-              <Button type="submit" variant="contained" color="primary">
-                Cadastrar
-              </Button>
+              <div style={{ paddingRight: 10 }}>
+                <Button
+                  type="button"
+                  variant="contained"
+                  color="error"
+                  onClick={handleClose}
+                >
+                  Cancelar
+                </Button>
+              </div>
+              <div>
+                <Button type="submit" variant="contained" color="primary">
+                  Cadastrar
+                </Button>
+              </div>
             </div>
           </form>
         </Box>
