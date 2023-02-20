@@ -1,7 +1,7 @@
 import * as React from "react";
 
 import SsidChartIcon from "@mui/icons-material/SsidChart";
-import { Card, CardContent, Typography } from "@mui/material";
+import { Typography } from "@mui/material";
 
 export const SimpleDatas = () => {
   return (
@@ -26,8 +26,8 @@ export const SimpleDatas = () => {
         <SsidChartIcon sx={{ width: 50, height: 50, paddingRight: 3 }} />
         VISÃO GERAL
       </Typography>
-
-      <div
+      
+      {/* <div
         style={{
           marginTop: 15,
           display: "flex",
@@ -81,7 +81,7 @@ export const SimpleDatas = () => {
             </CardContent>
           </Card>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

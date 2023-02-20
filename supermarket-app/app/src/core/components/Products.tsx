@@ -1,6 +1,8 @@
 import * as React from "react";
 
 import {
+  Alert,
+  AlertTitle,
   Box,
   Button,
   FormControl,
@@ -40,6 +42,77 @@ export const Products = () => {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
+  // Request
+  const [requestSuccess, setRequestSuccess] = React.useState(false);
+  const [requestError, setRequestError] = React.useState(false);
+
+  // Produtos
+  const [produtos, setProdutos] = React.useState<Estoque[]>([]);
+
+  /********************************************************/
+  // Pegar os produtos sempre que abrir ou atualizar
+  async function carregarProdutos() {
+    try {
+      const response = await fetch("http://localhost:4568/");
+      const json = await response.json();
+      setProdutos(json);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  React.useEffect(() => {
+    carregarProdutos();
+  }, []);
+
+  // Adicionar um novo produto no banco
+  async function adicionarItem(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    const formData = new FormData(event.currentTarget);
+
+    const data: Estoque = {
+      nome: formData.get("nome") as string,
+      descricao: formData.get("descricao") as string,
+      preco: Number(formData.get("preco")),
+      categoria: formData.get("categoria") as string,
+      quantidade: Number(formData.get("quantidade")),
+    };
+
+    try {
+      await fetch("http://localhost:4568/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      // Fechar Modal
+      handleClose();
+
+      setRequestSuccess(true);
+
+      setTimeout(() => {
+        setRequestSuccess(false);
+      }, 5000);
+
+      carregarProdutos();
+    } catch (error) {
+      console.log(error);
+      handleClose();
+      setRequestError(true);
+      setTimeout(() => {
+        setRequestError(false);
+      }, 5000);
+    }
+  }
+
+  // Remover o produto
+
+
+  /********************************************************/
+
   return (
     <div
       style={{
@@ -50,6 +123,39 @@ export const Products = () => {
         marginTop: 15,
       }}
     >
+      <div
+        id="alerta-request"
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "left",
+          marginLeft: 4,
+          marginRight: 4,
+        }}
+      >
+        {requestSuccess && (
+          <div id="alerta-request">
+            <Alert severity="success">
+              <AlertTitle>
+                <strong>Adicionado</strong>
+              </AlertTitle>
+              O produto foi cadastrado com sucesso.
+            </Alert>
+          </div>
+        )}
+
+        {requestError && (
+          <div id="alerta-request">
+            <Alert severity="error">
+              <AlertTitle>
+                <strong>Adicionado</strong>
+              </AlertTitle>
+              Tivemos um erro ao tentar adicionar o item.
+            </Alert>
+          </div>
+        )}
+      </div>
+
       <div
         style={{
           display: "flex",
@@ -97,35 +203,51 @@ export const Products = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            <TableRow
-              key="teste"
-              sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-            >
-              <TableCell
-                style={{ color: "#A7A6A6" }}
-                component="th"
-                scope="row"
+            {produtos.length === 0 ? (
+              <TableRow
+                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
               >
-                teste
-              </TableCell>
-              <TableCell style={{ color: "#A7A6A6" }} align="right">
-                teste
-              </TableCell>
-              <TableCell style={{ color: "#A7A6A6" }} align="right">
-                teste
-              </TableCell>
-              <TableCell style={{ color: "#A7A6A6" }} align="right">
-                teste
-              </TableCell>
-              <TableCell align="right">
-                <IconButton
-                  aria-label="Ações do produto"
+                <TableCell
                   style={{ color: "#A7A6A6" }}
+                  component="th"
+                  scope="row"
                 >
-                  <DeleteForeverIcon />
-                </IconButton>
-              </TableCell>
-            </TableRow>
+                  <strong>Nenhum produto foi encontrado!</strong>
+                </TableCell>
+              </TableRow>
+            ) : (
+              produtos.map((value, index) => (
+                <TableRow
+                  key={index}
+                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                >
+                  <TableCell
+                    style={{ color: "#A7A6A6" }}
+                    component="th"
+                    scope="row"
+                  >
+                    {value.nome}
+                  </TableCell>
+                  <TableCell style={{ color: "#A7A6A6" }} align="right">
+                    {value.categoria}
+                  </TableCell>
+                  <TableCell style={{ color: "#A7A6A6" }} align="right">
+                    {value.quantidade}
+                  </TableCell>
+                  <TableCell style={{ color: "#A7A6A6" }} align="right">
+                    R$ {value.preco}
+                  </TableCell>
+                  <TableCell align="right">
+                    <IconButton
+                      aria-label="Ações do produto"
+                      style={{ color: "#A7A6A6" }}
+                    >
+                      <DeleteForeverIcon />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </TableContainer>
@@ -145,7 +267,7 @@ export const Products = () => {
           >
             📋 <strong>Cadastrar novo produto</strong>
           </Typography>
-          <form /*onSubmit={}*/>
+          <form onSubmit={adicionarItem}>
             <FormControl fullWidth margin="normal">
               <InputLabel style={{ color: "#A7A6A6" }} htmlFor="nome-produto">
                 Nome do produto
@@ -153,6 +275,7 @@ export const Products = () => {
               <Input
                 style={{ color: "#A7A6A6" }}
                 id="nome-produto"
+                name="nome"
                 inputProps={{ maxLength: 15 }}
                 required
               />
@@ -167,6 +290,7 @@ export const Products = () => {
               <Input
                 style={{ color: "#A7A6A6" }}
                 id="descricao-produto"
+                name="descricao"
                 inputProps={{ maxLength: 150 }}
                 multiline
                 rows={3}
@@ -183,6 +307,7 @@ export const Products = () => {
               <Input
                 style={{ color: "#A7A6A6" }}
                 id="categoria-produto"
+                name="categoria"
                 inputProps={{ maxLength: 15 }}
                 required
               />
@@ -197,6 +322,7 @@ export const Products = () => {
               <Input
                 style={{ color: "#A7A6A6" }}
                 id="quantidade-produto"
+                name="quantidade"
                 type="number"
                 inputProps={{ min: 0 }}
                 required
@@ -209,6 +335,7 @@ export const Products = () => {
               <Input
                 style={{ color: "#A7A6A6" }}
                 id="preco-produto"
+                name="preco"
                 startAdornment={
                   <InputAdornment position="start">R$</InputAdornment>
                 }
@@ -225,21 +352,20 @@ export const Products = () => {
                 justifyContent: "right",
               }}
             >
-              <div style={{ paddingRight: 10 }}>
+              <div>
                 <Button
                   type="button"
                   variant="contained"
                   color="error"
+                  sx={{ marginRight: 3 }}
                   onClick={handleClose}
                 >
                   Cancelar
                 </Button>
               </div>
-              <div>
-                <Button type="submit" variant="contained" color="primary">
-                  Cadastrar
-                </Button>
-              </div>
+              <Button type="submit" variant="contained" color="primary">
+                Cadastrar
+              </Button>
             </div>
           </form>
         </Box>
