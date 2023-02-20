@@ -39,6 +39,20 @@ app.get('/', async (req, res) => {
   res.send(result)
 })
 
+app.delete('/:id', async (req, res) => {
+  const client = await connectToDatabase()
+  const estoque = collections.estoque
+
+  if (!estoque) {
+    return res.status(500).send("A coleção estoque não foi encontrada.")
+  }
+
+  const id = req.params.id
+  await estoque.deleteOne({ _id: new ObjectId(id) })
+  res.json({ message: "Excluído com sucesso do banco de dados." });
+  client.close()
+})
+
 app.listen(port, () => {
   console.log(`App listening at http://localhost:${port}`)
 })

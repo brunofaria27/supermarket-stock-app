@@ -24,6 +24,8 @@ import {
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 
+import { Estoque } from "../../typescript";
+
 const style = {
   position: "absolute" as "absolute",
   top: "50%",
@@ -42,9 +44,13 @@ export const Products = () => {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  // Request
+  // Request Add
   const [requestSuccess, setRequestSuccess] = React.useState(false);
   const [requestError, setRequestError] = React.useState(false);
+
+  // Request Remove
+  const [requestSuccessRmv, setRequestSuccessRmv] = React.useState(false);
+  const [requestErrorRmv, setRequestErrorRmv] = React.useState(false);
 
   // Produtos
   const [produtos, setProdutos] = React.useState<Estoque[]>([]);
@@ -109,7 +115,30 @@ export const Products = () => {
   }
 
   // Remover o produto
+  async function excluirProduto(id: string | undefined) {
+    try {
+      await fetch(`http://localhost:4568/${id}`, {
+        method: "DELETE",
+      });
+      const produtosAtualizados = produtos.filter(
+        (produto) => produto._id !== id
+      );
+      setProdutos(produtosAtualizados);
+      setRequestSuccessRmv(true);
 
+      setTimeout(() => {
+        setRequestSuccessRmv(false);
+      }, 5000);
+
+      carregarProdutos();
+    } catch (error) {
+      console.error(error);
+      setRequestErrorRmv(true);
+      setTimeout(() => {
+        setRequestErrorRmv(false);
+      }, 5000);
+    }
+  }
 
   /********************************************************/
 
@@ -151,6 +180,28 @@ export const Products = () => {
                 <strong>Adicionado</strong>
               </AlertTitle>
               Tivemos um erro ao tentar adicionar o item.
+            </Alert>
+          </div>
+        )}
+
+        {requestSuccessRmv && (
+          <div id="alerta-request">
+            <Alert severity="success">
+              <AlertTitle>
+                <strong>Removido</strong>
+              </AlertTitle>
+              O produto foi removido com sucesso.
+            </Alert>
+          </div>
+        )}
+
+        {requestErrorRmv && (
+          <div id="alerta-request">
+            <Alert severity="error">
+              <AlertTitle>
+                <strong>Removido</strong>
+              </AlertTitle>
+              Tivemos um erro ao tentar remover o item.
             </Alert>
           </div>
         )}
@@ -216,9 +267,9 @@ export const Products = () => {
                 </TableCell>
               </TableRow>
             ) : (
-              produtos.map((value, index) => (
+              produtos.map((value) => (
                 <TableRow
-                  key={index}
+                  key={value._id}
                   sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                 >
                   <TableCell
@@ -241,6 +292,7 @@ export const Products = () => {
                     <IconButton
                       aria-label="Ações do produto"
                       style={{ color: "#A7A6A6" }}
+                      onClick={() => excluirProduto(value._id)}
                     >
                       <DeleteForeverIcon />
                     </IconButton>
