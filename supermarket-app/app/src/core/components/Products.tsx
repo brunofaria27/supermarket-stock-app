@@ -25,6 +25,7 @@ import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 
 import { Estoque } from "../../typescript";
+import { EstoqueRe } from "../repositories/EstoqueRepository";
 
 const style = {
   position: "absolute" as "absolute",
@@ -38,7 +39,7 @@ const style = {
   p: 4,
 };
 
-export const Products = () => {
+export const Products = (props: { produtos: Estoque[], refreshProducts: () => void }) => {
   // Modal
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
@@ -52,28 +53,9 @@ export const Products = () => {
   const [requestSuccessRmv, setRequestSuccessRmv] = React.useState(false);
   const [requestErrorRmv, setRequestErrorRmv] = React.useState(false);
 
-  // Produtos
-  const [produtos, setProdutos] = React.useState<Estoque[]>([]);
-
   /********************************************************/
-  // Pegar os produtos sempre que abrir ou atualizar
-  async function carregarProdutos() {
-    try {
-      const response = await fetch("http://localhost:4568/");
-      const json = await response.json();
-      setProdutos(json);
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
-  React.useEffect(() => {
-    carregarProdutos();
-  }, []);
-
   // Adicionar um novo produto no banco
   async function adicionarItem(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
 
     const formData = new FormData(event.currentTarget);
 
@@ -86,15 +68,8 @@ export const Products = () => {
     };
 
     try {
-      await fetch("http://localhost:4568/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+      await EstoqueRe.addProducts(data)
 
-      // Fechar Modal
       handleClose();
 
       setRequestSuccess(true);
@@ -103,7 +78,7 @@ export const Products = () => {
         setRequestSuccess(false);
       }, 5000);
 
-      carregarProdutos();
+      props.refreshProducts();
     } catch (error) {
       console.log(error);
       handleClose();
@@ -117,20 +92,15 @@ export const Products = () => {
   // Remover o produto
   async function excluirProduto(id: string | undefined) {
     try {
-      await fetch(`http://localhost:4568/${id}`, {
-        method: "DELETE",
-      });
-      const produtosAtualizados = produtos.filter(
-        (produto) => produto._id !== id
-      );
-      setProdutos(produtosAtualizados);
+      await EstoqueRe.deleteProducts(id)
+
       setRequestSuccessRmv(true);
 
       setTimeout(() => {
         setRequestSuccessRmv(false);
       }, 5000);
 
-      carregarProdutos();
+      props.refreshProducts()
     } catch (error) {
       console.error(error);
       setRequestErrorRmv(true);
@@ -254,7 +224,7 @@ export const Products = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {produtos.length === 0 ? (
+            {props.produtos.length === 0 ? (
               <TableRow
                 sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
               >
@@ -267,7 +237,7 @@ export const Products = () => {
                 </TableCell>
               </TableRow>
             ) : (
-              produtos.map((value) => (
+              props.produtos.map((value) => (
                 <TableRow
                   key={value._id}
                   sx={{ "&:last-child td, &:last-child th": { border: 0 } }}

@@ -1,9 +1,26 @@
 import * as React from "react";
 
 import SsidChartIcon from "@mui/icons-material/SsidChart";
-import { Typography } from "@mui/material";
+import { Card, CardContent, Typography } from "@mui/material";
 
-export const SimpleDatas = () => {
+import { Estoque } from "../../typescript";
+
+function getStockInfo(produtos: Estoque[]) {
+  const estoqueZerado = produtos.filter((produto) => produto.quantidade === 0);
+  const estoqueMinimo = produtos.filter((produto) => produto.quantidade < 10 && produto.quantidade > 0);
+  const quantidadeTotal = produtos.reduce((total, produto) => total + produto.quantidade, 0);
+
+  return {
+    produtosCadastrados: produtos.length,
+    estoqueZerado: estoqueZerado.length,
+    estoqueMinimo: estoqueMinimo.length,
+    quantidadeTotal: quantidadeTotal,
+  };
+}
+
+export const SimpleDatas = (props: { produtos: Estoque[], refreshProducts: () => void }) => {
+  const stockInfo = getStockInfo(props.produtos);
+
   return (
     <div
       style={{
@@ -26,8 +43,8 @@ export const SimpleDatas = () => {
         <SsidChartIcon sx={{ width: 50, height: 50, paddingRight: 3 }} />
         VISÃO GERAL
       </Typography>
-      
-      {/* <div
+
+      <div
         style={{
           marginTop: 15,
           display: "flex",
@@ -49,10 +66,10 @@ export const SimpleDatas = () => {
           >
             <CardContent>
               <Typography variant="body2" color="#A7A6A6">
-                <strong>Produtos cadastrados: </strong>
+                <strong>Produtos cadastrados: </strong> {props.produtos.length}
               </Typography>
               <Typography variant="body2" color="#A7A6A6">
-                <strong>Quantidade de itens no estoque: </strong>
+                <strong>Quantidade de itens no estoque: </strong> {stockInfo.quantidadeTotal}
               </Typography>
             </CardContent>
           </Card>
@@ -73,15 +90,15 @@ export const SimpleDatas = () => {
           >
             <CardContent>
               <Typography variant="body2" color="#A7A6A6">
-                <strong>Produtos com o estoque zerado: </strong>
+                <strong>Produtos com o estoque zerado: </strong> {stockInfo.estoqueZerado}
               </Typography>
               <Typography variant="body2" color="#A7A6A6">
-                <strong>Produtos com o estoque mínimo: </strong>
+                <strong>Produtos com o estoque mínimo: </strong> {stockInfo.estoqueMinimo}
               </Typography>
             </CardContent>
           </Card>
         </div>
-      </div> */}
+      </div>
     </div>
   );
 };
