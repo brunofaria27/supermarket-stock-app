@@ -54,8 +54,30 @@ export const Products = (props: { produtos: Estoque[], refreshProducts: () => vo
   const [requestErrorRmv, setRequestErrorRmv] = React.useState(false);
 
   /********************************************************/
+  // Remover o produto
+  async function excluirProduto(id: string | undefined) {
+    try {
+      await EstoqueRe.deleteProducts(id)
+
+      setRequestSuccessRmv(true);
+
+      setTimeout(() => {
+        setRequestSuccessRmv(false);
+      }, 5000);
+
+      props.refreshProducts()
+    } catch (error) {
+      console.error(error);
+      setRequestErrorRmv(true);
+      setTimeout(() => {
+        setRequestErrorRmv(false);
+      }, 5000);
+    }
+  }
+
   // Adicionar um novo produto no banco
   async function adicionarItem(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault()
 
     const formData = new FormData(event.currentTarget);
 
@@ -85,27 +107,6 @@ export const Products = (props: { produtos: Estoque[], refreshProducts: () => vo
       setRequestError(true);
       setTimeout(() => {
         setRequestError(false);
-      }, 5000);
-    }
-  }
-
-  // Remover o produto
-  async function excluirProduto(id: string | undefined) {
-    try {
-      await EstoqueRe.deleteProducts(id)
-
-      setRequestSuccessRmv(true);
-
-      setTimeout(() => {
-        setRequestSuccessRmv(false);
-      }, 5000);
-
-      props.refreshProducts()
-    } catch (error) {
-      console.error(error);
-      setRequestErrorRmv(true);
-      setTimeout(() => {
-        setRequestErrorRmv(false);
       }, 5000);
     }
   }
