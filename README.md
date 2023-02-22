@@ -15,6 +15,6 @@ The page will reload if you make edits.\
 You will also see any lint errors in the console.
 
 ### Falta fazer:
-- Página de cadastro && cadastro no banco de dados
-- Página de login && login no banco de dados
 - Página de compra (apenas remover uma quantidade do item e redirecionar para uma página de sucesso) - Apenas visual, pois não tem a parte do pagamento, etc.
+- Fazer usuario adicionar mais quantidade do item no estoque
+- redirecionar o login do usuario se n for admin. (não acessar o estoque)
