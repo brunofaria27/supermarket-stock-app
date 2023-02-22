@@ -8,6 +8,7 @@ import { Products } from "./components/Products";
 import { Estoque } from "../typescript";
 import { EstoqueRe } from "./repositories/EstoqueRepository";
 import { Login } from "./components/Login";
+import { Cadastro } from "./components/Cadastro";
 
 function ControleEstoque() {
   const [produtos, setProdutos] = React.useState<Estoque[]>([]);
@@ -27,6 +28,7 @@ function ControleEstoque() {
 
   return (
     <>
+      <Header />
       <SimpleDatas produtos={produtos} refreshProducts={carregarProdutos}/>
       <Products produtos={produtos} refreshProducts={carregarProdutos}/>
     </>
@@ -41,13 +43,21 @@ function LoginPage() {
   );
 }
 
+function RegisterPage() {
+  return (
+    <>
+      <Cadastro />
+    </>
+  );
+}
+
 function App() {
   return (
     <>
-      <Header />
       <Routes>
         <Route path="/" element={<ControleEstoque />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
       </Routes>
     </>
   );
