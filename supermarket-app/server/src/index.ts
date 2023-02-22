@@ -1,9 +1,7 @@
 import * as express from 'express'
 import * as cors from 'cors'
 
-import { ObjectId } from 'mongodb'
 import { Request } from 'express'
-import { connectToDatabase, collections } from './services/server'
 import { addProducts, deleteProduct, getProducts } from './services/products'
 
 const app = express()

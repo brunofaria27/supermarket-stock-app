@@ -7,7 +7,8 @@ declare global {
       MONGO_PASS: string;
       MONGO_TOKEN: string;
       DB_NAME: string;
-      COLLECTION_NAME: string;
+      COLLECTION_NAME_ESTOQUE: string;
+      COLLECTION_NAME_USUARIO: string;
     }
   }
 }
